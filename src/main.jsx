@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter as Router } from "react-router-dom";
 import App from "./App.jsx";
 import "./index.css";
 import {PrivyProvider} from '@privy-io/react-auth';
@@ -12,7 +12,7 @@ root.render(
       appId="cm7mslm7t00hnx7utbgsj2572"
       config={{
         
-        // Customize Privy's appearance in your app
+        // Customize Privy's appearance
         appearance: {
           theme: 'dark',
         },
@@ -23,4 +23,4 @@ root.render(
           <App />
         </Router>
     </PrivyProvider>
-)
+);
