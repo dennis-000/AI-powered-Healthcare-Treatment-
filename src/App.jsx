@@ -1,4 +1,5 @@
 import React from "react";
+import Home from "./pages/Home";
 import {Route, Routes, useNavigate} from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
@@ -15,7 +16,7 @@ const  App = () => {
                 {/* Navbar */}
                 <Navbar/>
                 <Routes>
-                    <Route path="/" element={<div>Home page</div>} />
+                    <Route path="/" element={<Home/>} />
                 </Routes>
             </div>
         </div>
