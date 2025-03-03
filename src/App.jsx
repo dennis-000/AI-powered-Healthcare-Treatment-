@@ -8,6 +8,7 @@ import { useStateContext } from "./context";
 import { usePrivy } from "@privy-io/react-auth";
 
 import MedicalRecord from "./pages/records/index";
+import SingleRecordDetails from "./pages/records/SingleRecordDetails";
 
 const  App = () => {
         // Destructure values from usePrivy
@@ -43,6 +44,7 @@ const  App = () => {
                     <Route path="/onboarding" element={<Onboarding/>} />
                     <Route path="/profile" element={<Profile/>} />
                     <Route path="/medical-records" element={<MedicalRecord/>} />
+                    <Route path="/medical-records/:id" element={<SingleRecordDetails/>} />
 
                 </Routes>
             </div>
