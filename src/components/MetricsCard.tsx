@@ -35,7 +35,7 @@ const MetricsCard = ({
     </div>
     <a href="#"
         onClick={onClick}
-        className='inline-flex items-center justify-between rounded-b-xl border-t px-4 py-3 
+        className='border inline-flex items-center justify-between rounded-b-xl border-t px-4 py-3 
         text-sm md:px-5 border-neutral-800 text-neutral-400 hover:bg-neutral-800 w-full'
         >
         {subtitle}

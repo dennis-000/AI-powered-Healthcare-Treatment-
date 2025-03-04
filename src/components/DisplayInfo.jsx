@@ -72,6 +72,10 @@ const DisplayInfo = () => {
         },
         
     ];
+    // ==================================================
+    // ====== Add Health Insights to the dashboard =====
+    // ==================================================
+    
   return (
     // Two DIVS Upper and lower one with different number of elements
     <div className='flex flex-wrap gap-[26px]'>
