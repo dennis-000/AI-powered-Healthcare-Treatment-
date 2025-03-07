@@ -1,139 +1,126 @@
-// All functions we need to interact with the db
-import React from 'react';
-import { createContext, useContext, useState, useCallback } from 'react';
-import { BASE_URL } from '../../config';
+import React, { createContext, useContext, useState, useCallback } from "react";
+import { db } from "../utils/dbConfig";
+import { Users, Records } from "../utils/schema";
+import { eq } from "drizzle-orm";
 
+// Create a context
 const StateContext = createContext();
 
-export const StateProvider = ({ children }) => {
-    // States to store user and records
-    const [users, setUsers] = useState([]);
-    const [records, setRecords] = useState([]);
-    const [currentUser, setCurrentUser] = useState([]);
-    const fetchUsers = useCallback(async() => {
-        try {
-            const result = await fetch(`${BASE_URL}users`);
-            const data = await result.json();
-            setUsers(data);
-        } catch (error) {
-            console.error('Error fetching Users',error);
-        }
-       
-    },[]);
+// Provider component
+export const StateContextProvider = ({ children }) => {
+  const [users, setUsers] = useState([]);
+  const [records, setRecords] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
 
-    // function to fetch user details by email
-    const fetchUserByEmail = useCallback(async(email) => {
-        try {
-            const result = await fetch(`${BASE_URL}users?email=${email}`);
-            const data = await result.json();
-            if (data.length === 0) {
-                console.error('No user found with that email');
-                setCurrentUser(data[0]);
-                return;
-            }
-            
-        } catch (error) {
-            console.error('Error fetching User by email', error);
-        }
-    },[]);
+  // Function to fetch all users
+  const fetchUsers = useCallback(async () => {
+    try {
+      const result = await db.select().from(Users).execute();
+      setUsers(result);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  }, []);
 
-    // crete user details
-    const createUser = useCallback(async(user) => {
-        try {
-            const result = await fetch(`${BASE_URL}users`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(user)
-            });
-            const newUser = await result.json();
-            setUsers((prevUser) => [...prevUser, newUsers[0]]);
-        } catch (error) {
-            console.error('Error creating User', error);
-            return null;
-        }
-    },[]);
+  // Function to fetch user details by email
+  const fetchUserByEmail = useCallback(async (email) => {
+    try {
+      const result = await db
+        .select()
+        .from(Users)
+        .where(eq(Users.createdBy, email))
+        .execute();
+      if (result.length > 0) {
+        setCurrentUser(result[0]);
+      }
+    } catch (error) {
+      console.error("Error fetching user by email:", error);
+    }
+  }, []);
 
-    // function to fetch User records
-    const fetchUserRecords = useCallback(async(userEmail) => {
-        try {
-            const result = await fetch(`${BASE_URL}records`);
-            const data = await result.json();
-            setRecords(data);
-        } catch (error) {
-            console.error('Error fetching User Records', error);
-        }
-    },[]);
+  // Function to create a new user
+  const createUser = useCallback(async (userData) => {
+    try {
+        console.log("Creating user with data:", userData); // Debugging
+        const newUser = await db
+            .insert(Users)
+            .values(userData)
+            .returning({ id: Users.id, createdBy: Users.createdBy })
+            .execute();
+        setUsers((prevUsers) => [...prevUsers, newUser[0]]);
+        return newUser[0];
+    } catch (error) {
+        console.error("Error creating user:", error);
+        return null;
+    }
+}, []);
 
-    // function to create user records
-    const createRecord = useCallback(async(record) => {
-        try {
-            const result = await fetch(`${BASE_URL}records`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(record)
-            });
-            const newRecord = await result.json();
-            setRecords((prevRecords) => [...prevRecords, newRecord[0]]);
-            return newRecord[0];
-        } catch (error) {
-            console.error('Error creating Record', error);
-            return null;
-        }
-    },[]);
-    // Update record with new records
-    const updateRecord = useCallback(async(record) => {
-        try {
-            const result = await fetch(`${BASE_URL}records/${record.id}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(record)
-            });
-            const updatedRecord = await result.json();
-            setRecords((prevRecords) => prevRecords.map((r) => r.id === updatedRecord.id? updatedRecord : r));
-            return updatedRecord;
-        } catch (error) {
-            console.error('Error updating Record', error);
-            return null;
-        }
-    }, []);
-    // delete record
-    // const deleteRecord = useCallback(async(recordId) => {
-    //     try {
-    //         const result = await fetch(`${BASE_URL}records/${recordId}`, {
-    //             method: 'DELETE'
-    //         });
-    //         if (result.status === 204) {
-    //             setRecords((prevRecords) => prevRecords.filter((r) => r.id !== recordId));
-    //         }
-    //     } catch (error) {
-    //         console.error('Error deleting Record', error);
-    //     }
-    // }, []);
 
-    return (
-        <StateContext.Provider value={{
-            users,
-            records,
-            currentUser,
-            fetchUsers,
-            fetchUserByEmail,
-            createUser,
-            fetchUserRecords,
-            createRecord,
-            updateRecord,
-        }}>
-            {children}
-        </StateContext.Provider>
-    );
+  // Function to fetch all records for a specific user
+  const fetchUserRecords = useCallback(async (userEmail) => {
+    try {
+      const result = await db
+        .select()
+        .from(Records)
+        .where(eq(Records.createdBy, userEmail))
+        .execute();
+      setRecords(result);
+    } catch (error) {
+      console.error("Error fetching user records:", error);
+    }
+  }, []);
+
+  // Function to create a new record
+  const createRecord = useCallback(async (recordData) => {
+    try {
+      const newRecord = await db
+        .insert(Records)
+        .values(recordData)
+        .returning({ id: Records.id })
+        .execute();
+      setRecords((prevRecords) => [...prevRecords, newRecord[0]]);
+      return newRecord[0];
+    } catch (error) {
+      console.error("Error creating record:", error);
+      return null;
+    }
+  }, []);
+
+  const updateRecord = useCallback(async (recordData) => {
+    try {
+      const { documentID, ...dataToUpdate } = recordData;
+      console.log(documentID, dataToUpdate);
+      const updatedRecords = await db
+        .update(Records)
+        .set(dataToUpdate)
+        .where(eq(Records.id, documentID))
+        .returning()
+        .execute(); // Ensure execution
+      return updatedRecords[0]; // Return updated record
+    } catch (error) {
+      console.error("Error updating record:", error);
+      return null;
+    }
+  }, []);
+  
+  return (
+    <StateContext.Provider
+      value={{
+        users,
+        records,
+        fetchUsers,
+        fetchUserByEmail,
+        createUser,
+        fetchUserRecords,
+        createRecord,
+        currentUser,
+        updateRecord,
+      }}
+    >
+      {children}
+    </StateContext.Provider>
+  );
 };
 
-// Custom hook to use the state context
-export const useStateContext = () => {
-    return useContext(StateContext);
-};
+// Custom hook to use the context
+export const useStateContext = () => useContext(StateContext);

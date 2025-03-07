@@ -14,6 +14,7 @@ import ScreeningSchedule from "./pages/ScreeningSchedule";
 const  App = () => {
         // Destructure values from usePrivy
     const { user, authenticated, ready, login } = usePrivy();
+    console.log(usePrivy());
     // Get currentUser from context
     const {currentUser} = useStateContext();
 

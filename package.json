@@ -21,7 +21,7 @@
     "@thirdweb-dev/sdk": "^3",
     "appwrite": "14.0.1",
     "buffer": "^6.0.3",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.4.7",
     "drizzle-orm": "^0.32.1",
     "ethers": "^5.7.2",
     "markdown-to-jsx": "^7.4.7",
@@ -41,12 +41,14 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^2",
     "autoprefixer": "^10.4.13",
+    "crypto-browserify": "^3.12.1",
     "drizzle-kit": "^0.23.0",
     "postcss": "^8.4.19",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.5",
     "tailwindcss": "^3.2.4",
-    "vite": "^3"
+    "vite": "^3.2.10",
+    "vite-plugin-node-polyfills": "^0.23.0"
   },
   "main": "index.js",
   "license": "MIT"

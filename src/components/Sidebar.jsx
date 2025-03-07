@@ -1,85 +1,117 @@
-import React, { useState } from 'react'
-import {navLinks} from '../constants'
-import {Link, useNavigate} from 'react-router-dom'
-import {sun } from '../assets'
-import { IconHeartHandshake } from '@tabler/icons-react'
+import React, { useState, useEffect } from 'react';
+import { navLinks } from '../constants';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { sun } from '../assets';
+import Nkosuo from '../../src/assets/Nkosuo.png';
 
-const Icon = ({styles, name, imageUrl, isActive, disable, handleClick}) => {
-    return (
-        // if a link is active
-        <div className={` h-[48px] w-[48px] rounded-[10px] 
-            ${isActive && isActive === name && 'bg-[#2c2f32]'} flex items-center justify-center ${styles}`}
-            onClick={handleClick}
-            >
-                {/* if a class is not active */}
-                {!isActive ? (
-                    <img src={imageUrl} alt='Nkosuologo' 
-                    className='h-6 w-6' />
-                ): (
-                    <img src={imageUrl} alt='Nkosuologo'
-                    className={`h-6 w-6 ${isActive !== name ? 'grayscale' : ''}`}
-                    />
-                )}
-
-        </div>
-    )
-}
+const Icon = ({ styles, name, imageUrl, isActive, disable, handleClick }) => {
+  return (
+    <div
+      className={`flex items-center rounded-[10px] px-3 py-2 cursor-pointer transition-all duration-200
+        ${isActive && isActive === name ? 'bg-[#2c2f32]' : 'hover:bg-[#2c2f32]/50'} ${styles}`}
+      onClick={handleClick}
+    >
+      <div className="flex items-center justify-center h-[40px] w-[40px]">
+        <img 
+          src={imageUrl} 
+          alt={name} 
+          className={`h-5 w-5 transition-all duration-200
+            ${isActive && isActive === name ? '' : 'opacity-70'}`} 
+        />
+      </div>
+      
+      <span className={`ml-2 text-sm font-medium whitespace-nowrap transition-all duration-200
+        ${isActive && isActive === name ? 'text-white' : 'text-gray-400'}`}>
+        {name.charAt(0).toUpperCase() + name.slice(1)}
+      </span>
+    </div>
+  );
+};
 
 const Sidebar = () => {
-    /**
-     * The hook that allows us to navigate to other routes
-     */
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isActive, setIsActive] = useState('dashboard');
+  const [isMobile, setIsMobile] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-    /**
-     * The state variable that manages the active navigation item
-     */
-    const [isActive, setIsActive] = useState('dashboard')
-    
-    /**
-     * The function that handles the click event on a navigation item
-     */
-    const handleClick = (name) => {
-        setIsActive(name)
-        navigate(`/${name}`)
+  // Set active item based on current route
+  useEffect(() => {
+    const path = location.pathname.slice(1);
+    if (path) {
+      const activePage = navLinks.find(link => link.link === `/${path}`);
+      if (activePage) {
+        setIsActive(activePage.name);
+      }
+    } else {
+      setIsActive('dashboard');
     }
 
+    // Check if mobile view
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+      if (window.innerWidth < 768) {
+        setIsCollapsed(true);
+      }
+    };
+
+    checkIfMobile();
+    window.addEventListener('resize', checkIfMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkIfMobile);
+    };
+  }, [location.pathname]);
+
   return (
-    <div className='sticky top-5 flex h-[93vh] flex-col items-center justify-between'>
-        <Link
-        to='/'
-        >
-            <div className='rounded-[10px] bg-[#2c2f36] p-2'>
-                <IconHeartHandshake size={40} color='#1ec070'/>
-                {/* <img src={sun} alt='Nkosuo logo' className='h-6 w-6' /> */}
-            </div>
-        </Link>
+    <div className={`sticky top-5 flex h-[93vh] flex-col ${isCollapsed ? 'items-center' : 'items-start'} justify-between transition-all duration-300`}>
+      {/* Only the logo image */}
+      <Link to="/" className="flex justify-center items-center w-full">
+        <img 
+          src={Nkosuo} 
+          alt="Nkosuo Logo" 
+          className="w-20 h-20 object-contain"
+        />
+      </Link>
 
-        <div className='mt-12 flex w-[76px] flex-1 flex-col items-center
-        justify-between rounded-[20px] bg-[#1c1c24] py-4'>
-            <div className='flex flex-col items-center justify-between gap-3'>
-                {
-                    navLinks.map((link) => (
-                        <Icon
-                            key={link.name}
-                            {...link}
-                            isActive={isActive}
-                            // when user clicks on the icons then navigates
-                            handleClick={
-                                () => {
-                                setIsActive(link.name);
-                                navigate (link.link);
-                            }}
-                        />
-                    ))
-                }
-
-            </div>
-            <Icon styles='bg-[#1c1c24] shadow-secondary' imageUrl={sun}/>
+      {/* Navigation Menu */}
+      <div
+        className={`mt-6 flex flex-1 flex-col items-start
+        justify-between rounded-[20px] bg-[#1c1c24] py-4 ${isCollapsed ? 'w-16' : 'w-full min-w-[200px]'} transition-all duration-300`}
+      >
+        <div className="flex flex-col items-start justify-between gap-3 w-full px-2">
+          {navLinks.map((link) => (
+            <Icon
+              key={link.name}
+              {...link}
+              isActive={isActive}
+              handleClick={() => {
+                setIsActive(link.name);
+                navigate(link.link);
+              }}
+            />
+          ))}
         </div>
-
+        
+        {/* Settings/Theme Section */}
+        <div className="px-2 w-full mt-4 border-t border-gray-800 pt-4">
+          <div className="flex items-center rounded-[10px] px-3 py-2 cursor-pointer hover:bg-[#2c2f32]/50 transition-all duration-200">
+            <div className="flex items-center justify-center h-[40px] w-[40px]">
+              <img src={sun} alt="Theme" className="h-5 w-5 opacity-70" />
+            </div>
+            {!isCollapsed && (
+              <span className="ml-2 text-sm font-medium text-gray-400">Theme</span>
+            )}
+          </div>
+        </div>
+      </div>
+      
+      {/* Version info */}
+      <div className={`mt-4 text-xs text-gray-500 ${isCollapsed ? 'text-center' : 'px-2'}`}>
+        {!isCollapsed && 'v1.0.0'}
+      </div>
     </div>
-  )
-}
+  );
+};
 
 export default Sidebar;

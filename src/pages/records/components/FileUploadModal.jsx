@@ -1,14 +1,13 @@
-import React from 'react'
-import Modal from './Modal'
-import { IconProgress } from '@tabler/icons-react'
+import React from "react";
+import Modal from "./Modal";
+import { IconProgress } from "@tabler/icons-react";
 
-const FileUploadModal = () => ({
-
+const FileUploadModal = ({
   isOpen,
   onClose,
   onFileChange,
   onFileUpload,
-  upLoading,
+  uploading,
   uploadSuccess,
   filename,
 }) => {
@@ -20,7 +19,9 @@ const FileUploadModal = () => ({
       onAction={onFileUpload}
       actionLabel="Upload and Analyze"
     >
+      {/* File Upload Box */}
       <div className="flex w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 p-8 text-slate-700 dark:border-slate-700 dark:text-slate-300">
+        {/* Upload Icon */}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -34,6 +35,8 @@ const FileUploadModal = () => ({
             clipRule="evenodd"
           />
         </svg>
+
+        {/* File Input Label */}
         <div className="group">
           <label
             htmlFor="fileInputDragDrop"
@@ -42,7 +45,7 @@ const FileUploadModal = () => ({
             <input
               id="fileInputDragDrop"
               type="file"
-              className="sr-only"
+              className="sr-only" // Hides input but keeps accessibility
               aria-describedby="validFileFormats"
               onChange={onFileChange}
             />
@@ -50,22 +53,30 @@ const FileUploadModal = () => ({
           </label>
           or drag and drop here
         </div>
+
+        {/* Allowed File Formats */}
         <small id="validFileFormats">PNG, PDF, JPEG - Max 5MB</small>
       </div>
-      {/* When user is uploading a file wants to show progress */}
-      {upLoading && (
+
+      {/* Upload Progress Indicator */}
+      {uploading && (
         <IconProgress
           size={15}
           className="mr-3 mt-3 h-7 w-5 animate-spin text-white"
         />
       )}
 
+      {/* Upload Success Message */}
       {uploadSuccess && (
         <p className="mt-2 text-green-600">Upload successful!</p>
       )}
-      <span className="text-md text-left text-white">{filename}</span>
+
+      {/* Display Uploaded File Name */}
+      {filename && (
+        <span className="text-md text-left text-white">{filename}</span>
+      )}
     </Modal>
   );
 };
 
-export default FileUploadModal
+export default FileUploadModal;
