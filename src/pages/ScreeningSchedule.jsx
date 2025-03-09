@@ -4,12 +4,13 @@ import { useLocation } from "react-router-dom";
 
 const ScreeningSchedule = () => {
   const location = useLocation();
-  const state = location.state;
+  const state = location.state || {}; // Ensure state is never undefined
+  console.log("ScreeningSchedule state:", state);
 
   return (
     <div className="w-full overflow-scroll">
-      <KanbanBoard state={state} />
-    </div>
+    <KanbanBoard state={state} />
+</div>
   );
 };
 

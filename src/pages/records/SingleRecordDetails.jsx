@@ -145,8 +145,10 @@ function SingleRecordDetails() {
       kanbanRecords: text,
     });
     console.log(updatedRecord);
-    // navigate("/screening-schedules", { state: parsedResponse });
-    navigate("/screening-schedule", { state: { key: "value" } });
+    // navigate("/screening-schedule", { state: { key: "value" } });
+    navigate("/screening-schedules", { state: parsedResponse });
+
+
     setIsProcessing(false);
   };
 

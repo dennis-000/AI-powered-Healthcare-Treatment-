@@ -13,19 +13,26 @@ import TaskCard from "./TaskCard";
 import { IconPlus } from "@tabler/icons-react";
 
 function KanbanBoard({ state }) {
+  console.log("KanbanBoard received state:", state);
+console.log("Extracted columns:", state?.columns);
+console.log("Extracted tasks:", state?.tasks);
+
   // Extracting default columns and tasks from state
   const defaultCols =
-    state?.state?.columns?.map((col) => ({
-      id: col?.id,
-      title: col?.title,
-    })) || [];
+  state?.columns?.map((col) => ({
+    id: col?.id,
+    title: col?.title,
+  })) || [];
 
-  const defaultTasks =
-    state?.state?.tasks?.map((task) => ({
-      id: task?.id,
-      columnId: task?.columnId,
-      content: task?.content,
-    })) || [];
+const defaultTasks =
+  state?.tasks?.map((task) => ({
+    id: task?.id,
+    columnId: task?.columnId,
+    content: task?.content,
+  })) || [];
+
+
+
 
   // State management for columns and tasks
   const [columns, setColumns] = useState(defaultCols);
