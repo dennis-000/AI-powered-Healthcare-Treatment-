@@ -1,7 +1,15 @@
 import { IconChevronRight } from '@tabler/icons-react';
 import React from 'react';
 
-const MetricsCard = ({
+interface MetricsCardProps {
+    title: string;
+    subtitle: string;
+    value: string | number;
+    icon: React.ComponentType<any>;
+    onClick: () => void;
+}
+
+const MetricsCard: React.FC<MetricsCardProps> = ({
     title,
     subtitle,
     value,
@@ -27,14 +35,17 @@ const MetricsCard = ({
             </div>
         </div>
         <div className='flex size-[46px] h-11 w-11
-        flex-shrink-0 items-center justify-center rounded-full bg-gray-500 text-blue-200 dark:bg-[1c1c24]
+        flex-shrink-0 items-center justify-center rounded-full bg-gray-500 text-blue-200 dark:bg-[#1c1c24]
         absolute top-4 right-4'>
             {/* ==== Icon Container ==== */}
             <Icon size={25} className='text-green-500' />
         </div>
     </div>
     <a href="#"
-        onClick={onClick}
+        onClick={(e) => {
+            e.preventDefault();
+            onClick();
+        }}
         className='inline-flex items-center justify-between rounded-b-xl border-t px-4 py-3 
         text-sm md:px-5 border-neutral-800 text-neutral-400 hover:bg-neutral-800 w-full'
         >

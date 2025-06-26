@@ -11,12 +11,13 @@ import MedicalRecord from "./pages/records/index";
 import SingleRecordDetails from "./pages/records/SingleRecordDetails";
 
 const  App = () => {
-        // Destructure values from usePrivy
+    // Destructure values from usePrivy
     const { user, authenticated, ready, login } = usePrivy();
     // Get currentUser from context
     const {currentUser} = useStateContext();
 
-    const Navigate = useNavigate();
+    const navigate = useNavigate();
+    
     useEffect(() => {
         // If the App is ready but not authenticated, and Trigger the login
         if(ready && !authenticated) {
@@ -24,9 +25,14 @@ const  App = () => {
         }
         // If the user is logged in but not authenticated in the app context, redirect to onboarding
         if (user && !currentUser) {
-            Navigate('/onboarding');
+            navigate('/onboarding');
         }
-    }, [ ready, currentUser, Navigate])
+    }, [ready, authenticated, user, currentUser, navigate, login]);
+
+    // Show loading while privy is initializing
+    if (!ready) {
+        return <div className="flex items-center justify-center min-h-screen bg-[#13131a] text-white">Loading...</div>;
+    }
 
     // Destruct these from privy
     return (
@@ -45,7 +51,6 @@ const  App = () => {
                     <Route path="/profile" element={<Profile/>} />
                     <Route path="/medical-records" element={<MedicalRecord/>} />
                     <Route path="/medical-records/:id" element={<SingleRecordDetails/>} />
-
                 </Routes>
             </div>
         </div>

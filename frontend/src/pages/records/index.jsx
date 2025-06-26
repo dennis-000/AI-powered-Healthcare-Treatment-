@@ -1,18 +1,18 @@
 import { IconCirclePlus } from '@tabler/icons-react'
 import React, {useEffect, useState} from 'react'
-import recordCard from './components/recordCard'
+import RecordCard from './components/recordCard'
 import CreateRecordModal from './components/CreateRecordModal'
 import { usePrivy } from '@privy-io/react-auth'
 import { useStateContext } from '../../context'
 import { useNavigate } from 'react-router-dom'
 
-const index = () => {
+const MedicalRecords = () => {
 
   const navigate = useNavigate()
 
   const { user } = usePrivy()
 
-  const {records, fetchUserRecords, createRecord, fetchUserByEmail,currentUser} = useStateContext()
+  const {records, fetchUserRecords, createRecord, fetchUserByEmail, currentUser} = useStateContext()
 
   // state to manage user records
   const [userRecords, setUserRecords] = useState([])
@@ -43,29 +43,23 @@ const index = () => {
   // Function to create a new record
   const createFolder = async (foldername) => {
     try {
-      const newRecord = {
-        name: foldername,
-        createdBy: user.email.address,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }
-      const record = await createRecord(newRecord)
       if (currentUser) {
         const newRecord = await createRecord({
           userId: currentUser.id,
           recordName: foldername,
-          analysisResult: '',
-          kanbanRecords: '',
+          symptoms: '',
+          reportUrl: '',
           createdBy: user.email.address,
-
         });
+        
         if (newRecord){
           fetchUserRecords(user.email.address);
           handleCloseModal();
         }
-        // console.log('Record created successfully', record)
-        // setIsModalOpen(false)
-      } 
+      } else {
+        console.error('Current user not found');
+        handleCloseModal();
+      }
     } catch (error) {
       console.error('Error creating record', error);
       handleCloseModal();
@@ -74,7 +68,9 @@ const index = () => {
 
   // Navigate to the record details page
   const handleNavigate = (name) => {
-    const filteredRecords = userRecords.filter((record) => record.recordName === name)
+    const filteredRecords = userRecords.filter((record) => 
+      (record.recordName === name) || (record.name === name)
+    )
     navigate(`/medical-records/${name}`, {
       state: filteredRecords[0]
     })
@@ -89,12 +85,10 @@ const index = () => {
         bg-[#13131a] px-4 py-2 text-sm font-medium font-epilogue text-[16px] leading-[26px] text-white shadow-sm
         hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-600'
         onClick={handleOpenModal}
-        // onClick={() => console.log('Create Record')}
         >
             <IconCirclePlus/>
             Create Record
         </button>
-
 
         {/* Modal */}
         <CreateRecordModal
@@ -106,13 +100,12 @@ const index = () => {
         {/* Record Card */}
         <div className='grid w-full sm:grid-cols-2 sm:gap-6 md:grid-cols-3 lg:grid-cols-4 gap-6'>
           {/* Loop through what ever is coming from the db and this them in the card */}
-          {userRecords.map((record) => (
+          {userRecords.map((record, index) => (
             // Record Card Component
-            <recordCard
-            key={record.recordName}
+            <RecordCard
+            key={record.recordName || record.name || index}
             record={record}
             onNavigate={handleNavigate}
-           
             />
           ))}
         </div>
@@ -121,4 +114,4 @@ const index = () => {
   )
 }
 
-export default index;
+export default MedicalRecords;

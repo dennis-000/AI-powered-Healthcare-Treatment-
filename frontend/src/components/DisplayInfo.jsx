@@ -13,7 +13,7 @@ const DisplayInfo = () => {
         totalScreening: 0,
         completedScreenings: 0,
         pendingScreenings: 0,
-        overdueScreening: 0,
+        overdueScreenings: 0,
     })
 
     // Have to define the data in the MetricsCard, put everything into an array
@@ -22,35 +22,35 @@ const DisplayInfo = () => {
     const metricsData = [
         {
             title: 'Specialist Appointment Pending',
-            subtleTitle: 'View',
+            subtitle: 'View',
             value: metrics.pendingScreenings,
             icon: IconHourglassHigh,
             onClick: () => navigate('/appointments/pending')
         },
         {
             title: 'Treatment Progress Update',
-            subtleTitle: 'View',
+            subtitle: 'View',
             value: `${metrics.completedScreenings} of ${metrics.totalScreening}`,
             icon: IconCircleDashedCheck,
             onClick: () => navigate('/appointments/progress'),
         },
         {
             title: 'Total Folders',
-            subtleTitle: 'View',
+            subtitle: 'View',
             value: metrics.totalFolders,
             icon: IconFolder,
             onClick: () => navigate('/folders'),
         },
         {
             title: 'Total Screenings',
-            subtleTitle: 'View',
-            value: metrics.totalScreenings,
+            subtitle: 'View',
+            value: metrics.totalScreening,
             icon: IconUserScan,
             onClick: () => navigate('/screenings'),
         },
         {
             title: 'Completed Screenings',
-            subtleTitle: 'View',
+            subtitle: 'View',
             value: metrics.completedScreenings,
             icon: MdFitScreen,
             onClick: () => navigate('/screenings/completed'),
@@ -58,14 +58,14 @@ const DisplayInfo = () => {
 
         {
             title: 'Pending Screenings',
-            subtleTitle: 'View',
+            subtitle: 'View',
             value: metrics.pendingScreenings,
             icon: MdPendingActions,
             onClick: () => navigate('/screenings/pending'),
         },
         {
             title: 'Overdue Screenings',
-            subtleTitle: 'View',
+            subtitle: 'View',
             value: metrics.overdueScreenings,
             icon: MdPendingActions,
             onClick: () => navigate('/screenings/overdue'),
@@ -85,7 +85,7 @@ const DisplayInfo = () => {
             ))}
         </div>
             {/* Lower div */}
-        <div className='mt-[9px] grid w-full gap-4 sm:grid-cols sm:gap-6 lg:grid-cols-4'>
+        <div className='mt-[9px] grid w-full gap-4 sm:grid-cols-1 sm:gap-6 lg:grid-cols-4'>
             {metricsData.slice(2).map((metric)=> (
                 <MetricsCard
                     key={metric.title} {...metric}

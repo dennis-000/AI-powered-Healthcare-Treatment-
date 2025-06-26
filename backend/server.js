@@ -1,19 +1,27 @@
 import dotenv from 'dotenv';
 import express from 'express';
-import mongoose from 'mongoose';
+import cors from 'cors';
+import { connectDB } from './config/db.config.js';
 import authRouter from './routes/auth.routes.js';
 import reportRouter from './routes/report.routes.js';
 import userRouter from './routes/user.routes.js';
 
-dotenv.config()
+dotenv.config();
 
 const app = express();
+
+// Middleware
+app.use(cors());
 app.use(express.json());
 
-mongoose.connect(process.env.MONGO_URI).then(() => console.log('DB connected'));
+// Connect to database
+connectDB();
 
+// Routes
 app.use('/api/auth', authRouter);
 app.use('/api/reports', reportRouter);
-app.use('/api/reports', userRouter);
+app.use('/api/users', userRouter);
 
-app.listen(5000, () => console.log('Server running on port 5000'));
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

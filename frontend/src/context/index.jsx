@@ -9,16 +9,16 @@ export const StateProvider = ({ children }) => {
     // States to store user and records
     const [users, setUsers] = useState([]);
     const [records, setRecords] = useState([]);
-    const [currentUser, setCurrentUser] = useState([]);
+    const [currentUser, setCurrentUser] = useState(null);
+    
     const fetchUsers = useCallback(async() => {
         try {
             const result = await fetch(`${BASE_URL}users`);
             const data = await result.json();
-            setUsers(data);
+            setUsers(data.users || []);
         } catch (error) {
             console.error('Error fetching Users',error);
         }
-       
     },[]);
 
     // function to fetch user details by email
@@ -26,18 +26,18 @@ export const StateProvider = ({ children }) => {
         try {
             const result = await fetch(`${BASE_URL}users?email=${email}`);
             const data = await result.json();
-            if (data.length === 0) {
+            if (data.users && data.users.length > 0) {
+                setCurrentUser(data.users[0]);
+            } else {
                 console.error('No user found with that email');
-                setCurrentUser(data[0]);
-                return;
+                setCurrentUser(null);
             }
-            
         } catch (error) {
             console.error('Error fetching User by email', error);
         }
     },[]);
 
-    // crete user details
+    // create user details
     const createUser = useCallback(async(user) => {
         try {
             const result = await fetch(`${BASE_URL}users`, {
@@ -47,8 +47,13 @@ export const StateProvider = ({ children }) => {
                 },
                 body: JSON.stringify(user)
             });
-            const newUser = await result.json();
-            setUsers((prevUser) => [...prevUser, newUsers[0]]);
+            const data = await result.json();
+            if (data.success) {
+                setUsers((prevUsers) => [...prevUsers, data.user]);
+                setCurrentUser(data.user);
+                return data.user;
+            }
+            return null;
         } catch (error) {
             console.error('Error creating User', error);
             return null;
@@ -60,7 +65,7 @@ export const StateProvider = ({ children }) => {
         try {
             const result = await fetch(`${BASE_URL}records`);
             const data = await result.json();
-            setRecords(data);
+            setRecords(data.reports || []);
         } catch (error) {
             console.error('Error fetching User Records', error);
         }
@@ -76,14 +81,18 @@ export const StateProvider = ({ children }) => {
                 },
                 body: JSON.stringify(record)
             });
-            const newRecord = await result.json();
-            setRecords((prevRecords) => [...prevRecords, newRecord[0]]);
-            return newRecord[0];
+            const data = await result.json();
+            if (data.success) {
+                setRecords((prevRecords) => [...prevRecords, data.report]);
+                return data.report;
+            }
+            return null;
         } catch (error) {
             console.error('Error creating Record', error);
             return null;
         }
     },[]);
+    
     // Update record with new records
     const updateRecord = useCallback(async(record) => {
         try {
@@ -94,27 +103,17 @@ export const StateProvider = ({ children }) => {
                 },
                 body: JSON.stringify(record)
             });
-            const updatedRecord = await result.json();
-            setRecords((prevRecords) => prevRecords.map((r) => r.id === updatedRecord.id? updatedRecord : r));
-            return updatedRecord;
+            const data = await result.json();
+            if (data.success) {
+                setRecords((prevRecords) => prevRecords.map((r) => r.id === data.report.id ? data.report : r));
+                return data.report;
+            }
+            return null;
         } catch (error) {
             console.error('Error updating Record', error);
             return null;
         }
     }, []);
-    // delete record
-    // const deleteRecord = useCallback(async(recordId) => {
-    //     try {
-    //         const result = await fetch(`${BASE_URL}records/${recordId}`, {
-    //             method: 'DELETE'
-    //         });
-    //         if (result.status === 204) {
-    //             setRecords((prevRecords) => prevRecords.filter((r) => r.id !== recordId));
-    //         }
-    //     } catch (error) {
-    //         console.error('Error deleting Record', error);
-    //     }
-    // }, []);
 
     return (
         <StateContext.Provider value={{

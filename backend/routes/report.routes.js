@@ -1,5 +1,5 @@
 import express  from 'express';
-import { uploadReport } from '../controllers/report.controller.js';
+import { uploadReport, getAllReports, getSpecificReportById, getAllReportsOfSpecificUser } from '../controllers/report.controller.js';
 import { protect } from '../middlewares/auth.middleware.js';
 
 const reportRouter = express.Router();

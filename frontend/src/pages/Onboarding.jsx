@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
 import { useStateContext } from '../context/index';
 import { usePrivy } from '@privy-io/react-auth';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Onboarding = () => {
     const [username, setUsername] = useState('')
     const [age, setAge] = useState('');
     const [location, setLocation] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     
 // ============ Destruct the create user function from the state context ============
@@ -14,28 +15,37 @@ const Onboarding = () => {
 
     // ============ Destruct the user object from the privy auth ============
     const { user } = usePrivy();
+    const navigate = useNavigate();
 
     console.log(user);
     const handleOnboardingSubmit = async(e) => {
         e.preventDefault();
-        // Create a new user object
-        const userData = {
-            username,
-            age: parseInt(age, 10),
-            location,
-            // Because we are using privy hook
-            createdBy: user.email.address,
-        };
-        // const to hold the new user data
-        const newUser = await createUser(userData);
+        setIsLoading(true);
+        
+        try {
+            // Create a new user object
+            const userData = {
+                name: username,
+                email: user.email.address,
+                age: parseInt(age, 10),
+                location,
+                // Because we are using privy hook
+                createdBy: user.email.address,
+            };
+            // const to hold the new user data
+            const newUser = await createUser(userData);
 
-        if (newUser) {
-            Navigate ('/profile');
-            console.log('User created successfully', newUser);
-        } else {
-            console.error('Error creating user');}
-        console.log(newUser);
-        console.log(username, age, location);
+            if (newUser) {
+                navigate('/profile');
+                console.log('User created successfully', newUser);
+            } else {
+                console.error('Error creating user');
+            }
+        } catch (error) {
+            console.error('Error during onboarding:', error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
 
@@ -91,9 +101,10 @@ const Onboarding = () => {
                 {/* Submit Button */}
                 <div className='mb-4'>
                     <button type="submit" 
+                    disabled={isLoading}
                     className='w-full rounded-lg bg-blue-500 text-white px-4 py-3 font-bold hover:bg-blue-600
-                    focus:outline-none focus:ring-2 focus:ring-blue-600'>
-                        Get Started
+                    focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:opacity-50'>
+                        {isLoading ? 'Creating Account...' : 'Get Started'}
                     </button>
                 </div>
 
